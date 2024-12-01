@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@{
+    Dictionary<string, double> exchangeRates = new Dictionary<string, double>
+    {
+        {"USD", 1.0 },
+        {"EURO", 0.85 },
+        {"GBP", 0.72 },
+        {"JPY", 110.25 }
+    };
+
+    double amount = 0;
+    string fromCurrency = "";
+    string toCurrency = "";
+    double result = 0;
+
+    if(Context.Request.Method == "POST")
+    {
+        amount = double.Parse(Context.Request.Form["amount"]);
+        fromCurrency = Context.Request.Form["fromCurrenct"];
+        toCurrency = Context.Request.Form["toCurrency"];
+
+        if(exchangeRates.ContainsKey(fromCurrency) && exchangeRates.ContainsKey(toCurrency))
+        {
+            result = amount * exchangeRates[fromCurrency] / exchangeRates[toCurrency];
+        }
+    }
+}
+
+<h2>Конвретор Валют</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="amount">Sum:</label>
+        <input type="number" id="amount" name="amount" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <label for="fromCurrency">Из валюты:</label>
+        <select id="fromCurrecny" name="fromCurrency" class="form-control"
+            @foreach(var currency in exchangeRates.Keys)
+            {
+            <option value="@currency">@currency</option>
+        }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="toCurrency">в валюту:</label>
+        <select id="toCurrency" name="toCurrency" class="form-control">
+            @foreach(var currecny in exchangeRates.Keys)
+            {
+                <option value="@currecny">@currecny</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Конвертировать</button>
+</form>
+
+@if(result !=0)
+{
+    <div>
+        <h3>Результат конвертации</h3>
+        <p>@amount @fromCurrency = @result @toCurrency</p>
+    </div>
+}
